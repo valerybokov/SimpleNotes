@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="prj.simplenotes.ui.settingsfragment.SettingsViewModel" />
+    </data>
+
+    <ScrollView
+        tools:context=".ui.settingsfragment.SettingsFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_marginTop="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/sTextSize"
+                />
+
+            <RadioGroup
+                android:id="@+id/radioGroup"
+                android:layout_marginStart="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkedButton="@={viewModel.currentTextSizeIndex}">
+                <RadioButton
+                    android:id="@+id/rbDefaultTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sDefault"
+                    />
+                <RadioButton
+                    android:id="@+id/rbBigTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sBigText"
+                    />
+                <RadioButton
+                    android:id="@+id/rbBiggestTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sBiggest"
+                    />
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/tbTxtColor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:text="@string/sTextColor"
+                />
+
+            <FrameLayout
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:padding="2dp"
+                android:background="@drawable/button_border"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/bTextColor"
+                    android:layout_gravity="center_horizontal"
+                    android:minWidth="180dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:text="@string/sBackground"
+                />
+
+            <FrameLayout
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:padding="2dp"
+                android:background="@drawable/button_border"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/bBackground"
+                    android:minWidth="180dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@drawable/example_text_border">
+                <TextView
+                    android:id="@+id/tvExample"
+                    android:minHeight="48dp"
+                    android:layout_margin="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|center_horizontal"
+                    android:text="@string/sExample"
+                    />
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+</layout>

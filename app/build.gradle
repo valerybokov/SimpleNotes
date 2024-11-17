@@ -1,0 +1,70 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+}
+
+android {
+    namespace 'prj.simplenotes'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "prj.simplenotes"
+        minSdk 28
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    implementation libs.androidx.core.ktx
+    implementation libs.androidx.appcompat
+    implementation libs.material
+    implementation libs.androidx.activity
+    implementation libs.room.runtime
+    implementation libs.room.ktx
+    implementation libs.ambilwarna
+    implementation libs.androidx.junit.ktx
+    kapt libs.room.compiler
+    implementation libs.androidx.constraintlayout
+    implementation libs.androidx.navigation.ui
+    implementation libs.androidx.navigation.fragment
+    implementation libs.androidx.legacy.support.v4
+    implementation libs.androidx.lifecycle.livedata.ktx
+    implementation libs.androidx.lifecycle.viewmodel.ktx
+    implementation libs.androidx.lifecycle.runtime.ktx
+    implementation libs.androidx.fragment.ktx
+
+    testImplementation libs.kotlinx.coroutines.test
+    testImplementation libs.junit
+    testImplementation libs.androidx.core.testing
+    testImplementation libs.androidx.lifecycle.viewmodel.savedstate
+    testImplementation libs.mockito.core
+    testImplementation libs.mockito.kotlin
+    androidTestImplementation libs.androidx.espresso.core
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="title_size">22sp</dimen>
+    <dimen name="text_size">20sp</dimen>
+    <dimen name="item_note_corner_radius">12dp</dimen>
+    <dimen name="item_note_min_height">100dp</dimen>
+</resources>

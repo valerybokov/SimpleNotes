@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="prj.simplenotes.ui.editnotefragment.EditNoteViewModel" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/viewParent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="20"
+        tools:context=".ui.editnotefragment.EditNoteFragment">
+        <EditText
+            android:id="@+id/tbTitle"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:autoLink="web"
+            android:autofillHints="false"
+            android:ems="10"
+            android:hint="@string/hintNoteTitle"
+            android:text="@={viewModel.title}"
+            android:maxLength="@{viewModel.maxSymbolsNumberForTitle}"
+            android:inputType="textMultiLine"
+            android:linksClickable="true"
+            android:scrollbars="vertical" />
+
+        <EditText
+            android:id="@+id/tbEdit"
+            android:layout_weight="19"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:autoLink="web"
+            android:autofillHints="false"
+            android:gravity="top"
+            android:ems="10"
+            android:hint="@string/hintNoteBody"
+            android:text="@={viewModel.text}"
+            android:maxLength="@{viewModel.maxSymbolsNumberForBody}"
+            android:inputType="textMultiLine"
+            android:linksClickable="true"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+</layout>
