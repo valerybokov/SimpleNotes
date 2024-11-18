@@ -15,7 +15,7 @@
     <string name="external_background">external background</string>
     <string name="msgRemove">Delete the entry?</string>
     <string name="title_nameAddVers">NOTES version %s</string>
-    <string name="author">Author: Valery Bokov</string>
+    <string name="author">Author: [me]</string>
     <string name="msgOk">OK</string>
     <string name="noteNew">NEW NOTE</string>
     <string name="noteEdit">EDIT NOTE</string>
