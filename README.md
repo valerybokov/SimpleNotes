@@ -22,6 +22,6 @@ The Android app "Notes" for phones and tablets.
 - [x] add item complete mark in item view (item_note)
 - [ ] use the DataStore instead of the SharedPreferences?
 - [ ] item creation date and item change date as a part of view (item_note)
-- [ ] add dark mode support
+- [x] add dark mode support (change vector icons color for better look in dark mode)
 
-![Detail View](/doc/mainview.png)
+![Detail View](/doc/mainview.png)#000000
