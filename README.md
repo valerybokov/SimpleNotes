@@ -19,9 +19,9 @@ The Android app "Notes" for phones and tablets.
 - delete an item from edit item fragment
 
 # To do
-- [x] add app icon
-- [ ] add item complete mark in item view (item_note)
+- [x] add item complete mark in item view (item_note)
 - [ ] use the DataStore instead of the SharedPreferences?
 - [ ] item creation date and item change date as a part of view (item_note)
+- [ ] add dark mode support
 
 ![Detail View](/doc/mainview.png)

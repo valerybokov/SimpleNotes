@@ -4,6 +4,7 @@ import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.util.Supplier
@@ -26,6 +27,7 @@ class ItemViewHolder(
     private val tvTitle: TextView = root.findViewById(R.id.tvTitle)
     private val tvText: TextView = root.findViewById(R.id.tvText)
     private val bDelete: ImageButton = root.findViewById(R.id.bDelete)
+    private val imCompleted: ImageView = root.findViewById(R.id.imCompleted)
     private val clickListener = ItemClickListener(itemClickListener, OPERATION_ITEM_CLICK)
     private val deleteClickListener = ItemClickListener(itemClickListener, OPERATION_ITEM_DELETE)
     private val background = GradientDrawable()
@@ -52,6 +54,9 @@ class ItemViewHolder(
 
         tvText.text = note.text
         tvText.setTextSize(TypedValue.COMPLEX_UNIT_PX, noteTextSize.textSize)
+
+        imCompleted.visibility =
+            if (note.isCompleted) View.VISIBLE else View.INVISIBLE
     }
 
     fun onDetach() {
