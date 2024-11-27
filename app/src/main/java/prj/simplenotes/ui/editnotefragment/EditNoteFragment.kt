@@ -22,9 +22,12 @@ import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController.OnDestinationChangedListener
 import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import prj.simplenotes.R
 import prj.simplenotes.data.Note
@@ -119,23 +122,33 @@ class EditNoteFragment : Fragment(), MenuProvider {
         val tbTitle = activity.findViewById<TextView>(R.id.tbTitle)
         val tbEdit = activity.findViewById<TextView>(R.id.tbEdit)
 
-        @ColorInt val background = tbEdit.backgroundColor
-        @ColorInt val backgroundColor = viewModel.getBackgroundColor(background)
-        @ColorInt val textColor = viewModel.getTextColor(tbEdit.currentTextColor)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.getTitleSize(tbTitle.textSize).collectLatest { titleSize ->
+                    tbTitle.setTextSize(
+                        android.util.TypedValue.COMPLEX_UNIT_PX,
+                        titleSize
+                    )
+                }
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.getTextSize(tbEdit.textSize).collect { textSize ->
+                tbEdit.setTextSize(
+                    android.util.TypedValue.COMPLEX_UNIT_PX,
+                    textSize
+                )
+            }
+        }
+        lifecycleScope.launch {
+            @ColorInt val background = tbEdit.backgroundColor
+            @ColorInt val backgroundColor = viewModel.getBackgroundColor(background)
+            @ColorInt val textColor = viewModel.getTextColor(tbEdit.currentTextColor)
 
-        itemParent.setBackgroundColor(backgroundColor)
-        tbTitle.setTextColor(textColor)
-        tbEdit.setTextColor(textColor)
-
-        tbTitle.setTextSize(
-            android.util.TypedValue.COMPLEX_UNIT_PX,
-            viewModel.getTitleSize(tbTitle.textSize)
-        )
-
-        tbEdit.setTextSize(
-            android.util.TypedValue.COMPLEX_UNIT_PX,
-            viewModel.getTextSize(tbEdit.textSize)
-        )
+            itemParent.setBackgroundColor(backgroundColor)
+            tbTitle.setTextColor(textColor)
+            tbEdit.setTextColor(textColor)
+        }
 
         dialogClickListener = DialogClickListener(
             viewModel::deleteNote, ::notDeleteNote)

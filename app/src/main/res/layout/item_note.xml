@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="4dp"
-    android:background="@drawable/item_note_background"
+    tools:background="@drawable/item_note_background"
     android:minHeight="@dimen/item_note_min_height">
 
     <TextView

@@ -1,76 +1,86 @@
 package prj.simplenotes.data
 
-import android.content.SharedPreferences
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 interface Settings {
-    fun readInt(key: String, defaultValue: Int): Int
+    suspend fun readInt(key: String, defaultValue: Int): Int
 
-    fun readFloat(key: String, defaultValue: Float): Float
+    fun readFloat(key: String, defaultValue: Float): Flow<Float>
 
-    fun readBoolean(key: String, defaultValue: Boolean): Boolean
+    suspend fun readBoolean(key: String, defaultValue: Boolean): Boolean
 
     fun write(key: String, value: Float)
 
     fun write(key: String, value: Int)
 
     fun write(key: String, value: Boolean)
-
-    fun setOnChangedListener(value: OnChangedListener)
-
-    fun removeOnChangedListener()
-
-    interface OnChangedListener {
-        fun onChanged(key: String)
-    }
 }
 
 class AndroidSettings(
-    private val prefs: SharedPreferences): Settings {
-    private val onSharedPreferenceChangeListener = OnSharedPreferenceChangeListener()
+    private val appContext: Context): Settings {
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "preferences")
+    private var scope: CoroutineScope? = null
 
-    init {
-        //no need to unsubscribe
-        prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+    fun setScope(value: CoroutineScope?) {
+        scope = value
     }
 
-    override fun readFloat(key: String, defaultValue: Float): Float {
-        return prefs.getFloat(key, defaultValue)
+    override fun readFloat(key: String, defaultValue: Float): Flow<Float> {
+        return appContext.dataStore.data.map { prefs ->
+            val prefsKey = floatPreferencesKey(key)
+            prefs[prefsKey] ?: defaultValue
+        }
     }
 
-    override fun readBoolean(key: String, defaultValue: Boolean): Boolean {
-        return prefs.getBoolean(key, defaultValue)
+    override suspend fun readBoolean(key: String, defaultValue: Boolean): Boolean {
+        val prefsKey = booleanPreferencesKey(key)
+        val prefs = appContext.dataStore.data.first()
+        return prefs[prefsKey] ?: defaultValue
     }
 
     override fun write(key: String, value: Float) {
-        prefs.edit().putFloat(key, value).apply()
+        scope?.launch(Dispatchers.IO) {
+            appContext.dataStore.edit { prefs ->
+                val prefsKey = floatPreferencesKey(key)
+                prefs[prefsKey] = value
+            }
+        }
     }
 
-    override fun readInt(key: String, defaultValue: Int): Int {
-        return prefs.getInt(key, defaultValue)
+    override suspend fun readInt(key: String, defaultValue: Int): Int {
+        val prefsKey = intPreferencesKey(key)
+        val prefs = appContext.dataStore.data.first()
+        return prefs[prefsKey] ?: defaultValue
     }
 
     override fun write(key: String, value: Int) {
-        prefs.edit().putInt(key, value).apply()
+        scope?.launch(Dispatchers.IO) {
+            appContext.dataStore.edit { prefs ->
+                val prefsKey = intPreferencesKey(key)
+                prefs[prefsKey] = value
+            }
+        }
     }
 
     override fun write(key: String, value: Boolean) {
-        prefs.edit().putBoolean(key, value).apply()
-    }
-
-    override fun setOnChangedListener(value: Settings.OnChangedListener) {
-        onSharedPreferenceChangeListener.onChangedListener = value
-    }
-
-    override fun removeOnChangedListener() {
-        onSharedPreferenceChangeListener.onChangedListener = null
-    }
-
-    private class OnSharedPreferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener {
-        var onChangedListener: Settings.OnChangedListener? = null
-
-        override fun onSharedPreferenceChanged(prefs: SharedPreferences, key: String?) {
-            key ?: return
-            onChangedListener?.onChanged(key)
+        scope?.launch(Dispatchers.IO) {
+            appContext.dataStore.edit { prefs ->
+                val prefsKey = booleanPreferencesKey(key)
+                prefs[prefsKey] = value
+            }
         }
     }
 }

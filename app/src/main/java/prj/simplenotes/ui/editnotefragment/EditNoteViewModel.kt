@@ -1,6 +1,6 @@
 package prj.simplenotes.ui.editnotefragment
-//https://medium.com/deuk/intermediate-android-compose-todo-app-with-room-database-18fd97436c6d
-//https://johncodeos.com/how-to-use-room-in-android-using-kotlin/
+
+import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.annotation.IntDef
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
@@ -9,7 +9,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedStateRegistryOwner
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import prj.simplenotes.data.Note
 import prj.simplenotes.data.Settings
 import prj.simplenotes.domain.NotesRepository
@@ -52,20 +56,25 @@ class EditNoteViewModel(
         }
     }
 
-    fun getTextColor(@ColorInt currentTextColor: Int): Int =
+    @ColorInt
+    private var _defaultBackground = Color.TRANSPARENT
+
+    suspend fun getTextColor(@ColorInt currentTextColor: Int): Int =
         _settings.readInt(TXT_COLOR_KEY, currentTextColor)
 
     /** Returns a note background color. It is the same for all notes.
      * @param defaultBackground this is default background for note */
-    fun getBackgroundColor(@ColorInt defaultBackground: Int): Int =
+    suspend fun getBackgroundColor(@ColorInt defaultBackground: Int): Int =
         _settings.readInt(BACKGROUND_KEY, defaultBackground)
 
-    fun getTextSize(baseTextSize: Float): Float {
-        return _settings.readFloat(TXT_SIZE_COEFF_KEY, TXT_SIZE_COEFF_UNSET) * baseTextSize
+    fun getTextSize(baseTextSize: Float): Flow<Float> =
+        _settings.readFloat(TXT_SIZE_COEFF_KEY, TXT_SIZE_COEFF_UNSET).map { coefficient ->
+        coefficient * baseTextSize
     }
 
-    fun getTitleSize(baseTitleSize: Float): Float {
-        return _settings.readFloat(TXT_SIZE_COEFF_KEY, TXT_SIZE_COEFF_UNSET) * baseTitleSize
+    fun getTitleSize(baseTitleSize: Float): Flow<Float> =
+        _settings.readFloat(TXT_SIZE_COEFF_KEY, TXT_SIZE_COEFF_UNSET).map { coefficient ->
+            coefficient * baseTitleSize
     }
 
     val maxSymbolsNumberForTitle: Int = 128
@@ -111,6 +120,12 @@ class EditNoteViewModel(
 
         title.observeForever(_titleChangedObserver)
         text.observeForever(_textChangedObserver)
+
+        viewModelScope.launch {
+            _defaultBackground = _settings.readInt(
+                DEFAULT_BACKGROUND_KEY, DEFAULT_BACKGROUND_VALUE
+            )
+        }
     }
 
     fun init(value: Note?) {
@@ -171,11 +186,14 @@ class EditNoteViewModel(
             if (text.isNotEmpty() || title.isNotEmpty()) {
                 val background = backgroundToNotNull(_handle.get<Int>(HANDLE_BACKGROUND))
                 _repo.addItem(
-                    Note(id = 0,
+                    Note(
+                        id = 0,
                         background = background,
                         text = text,
                         title = title,
-                        isCompleted = _isCompleted.value!!))
+                        isCompleted = _isCompleted.value!!
+                    )
+                )
             }
         }
         //edit item
@@ -196,12 +214,7 @@ class EditNoteViewModel(
     }
 
     private fun backgroundToNotNull(background: Int?): Int {
-        if (background == null) {
-            return _settings.readInt(
-                DEFAULT_BACKGROUND_KEY, DEFAULT_BACKGROUND_VALUE
-            )
-        }
-        return background
+        return background ?: _defaultBackground
     }
 
     /** Set note to completed or not completed */
@@ -232,8 +245,7 @@ class EditNoteViewModel(
             val note = _note
 
             if (note == null) {
-                return _settings.readInt(
-                    DEFAULT_BACKGROUND_KEY, DEFAULT_BACKGROUND_VALUE)
+                return _defaultBackground
             }
             else {
                 return note.background

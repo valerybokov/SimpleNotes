@@ -1,7 +1,5 @@
 package prj.simplenotes.ui.settingsfragment
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +11,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import prj.simplenotes.R
 import prj.simplenotes.ui.NotesApplication
 import prj.simplenotes.ui.common.ColorDialogListener
+import prj.simplenotes.ui.utils.backgroundColor
 import yuku.ambilwarna.AmbilWarnaDialog
 
 class SettingsFragment: Fragment(), RadioGroup.OnCheckedChangeListener {
@@ -40,7 +44,7 @@ class SettingsFragment: Fragment(), RadioGroup.OnCheckedChangeListener {
         }
 
         val tvExample = activity.findViewById<TextView>(R.id.tvExample)
-        val initBackground = getBackgroundColor(tvExample)
+        val initBackground = tvExample.backgroundColor
         val rbDefaultTxt = activity.findViewById<RadioButton>(R.id.rbDefaultTxt)
 
         viewModel.init(
@@ -73,7 +77,7 @@ class SettingsFragment: Fragment(), RadioGroup.OnCheckedChangeListener {
             dialog.show()
         }
         bBackground.setOnClickListener {
-            val background = getBackgroundColor(tvExample)
+            val background = tvExample.backgroundColor
 
             val dialog = AmbilWarnaDialog(
                 it.context,
@@ -87,21 +91,22 @@ class SettingsFragment: Fragment(), RadioGroup.OnCheckedChangeListener {
             dialog.show()
         }
 
-        val radioGroup = activity.findViewById<RadioGroup>(R.id.radioGroup)
-        radioGroup.check(indexToId(viewModel.currentTextSizeIndex))
-        radioGroup.setOnCheckedChangeListener(this)
-
         viewModel.textSize.observe(viewLifecycleOwner) { txtSize ->
             tvExample.setTextSize(
                 android.util.TypedValue.COMPLEX_UNIT_PX,
                 txtSize
             )
         }
-    }
 
-    private fun getBackgroundColor(tvExample: TextView): Int {
-        val backgroundDrawable = tvExample.background as? ColorDrawable
-        return backgroundDrawable?.color ?: Color.TRANSPARENT
+        val radioGroup = activity.findViewById<RadioGroup>(R.id.radioGroup)
+        radioGroup.setOnCheckedChangeListener(this)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.currentTextSizeIndex.collectLatest { index ->
+                    radioGroup.check(indexToId(index))
+                }
+            }
+        }
     }
 
     private fun indexToId(currentTextSizeIndex: Int): Int = when(currentTextSizeIndex) {
@@ -112,9 +117,15 @@ class SettingsFragment: Fragment(), RadioGroup.OnCheckedChangeListener {
 
     override fun onCheckedChanged(group: RadioGroup, radioButtonId: Int) {
         when(radioButtonId) {
-            R.id.rbDefaultTxt -> viewModel.currentTextSizeIndex = TEXT_SIZE_DEFAULT
-            R.id.rbBigTxt ->    viewModel.currentTextSizeIndex = TEXT_SIZE_BIG
-            R.id.rbBiggestTxt -> viewModel.currentTextSizeIndex = TEXT_SIZE_BIGGEST
+            R.id.rbDefaultTxt -> {
+                viewModel.updateTextSizeIndex(TEXT_SIZE_DEFAULT)
+            }
+            R.id.rbBigTxt -> {
+                viewModel.updateTextSizeIndex(TEXT_SIZE_BIG)
+            }
+            R.id.rbBiggestTxt -> {
+                viewModel.updateTextSizeIndex(TEXT_SIZE_BIGGEST)
+            }
         }
     }
 }

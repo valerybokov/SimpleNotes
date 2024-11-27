@@ -7,7 +7,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import prj.simplenotes.data.Settings
 
 const val TXT_SIZE_COEFF_KEY = "TXT_SIZE_COEFF"
@@ -33,6 +37,8 @@ class SettingsViewModel(
         }
     }
 
+    private var _isLoading = true
+
     private val _textSize = MutableLiveData<Float>()
     val textSize: LiveData<Float> = _textSize
 
@@ -54,36 +60,25 @@ class SettingsViewModel(
         settings.write(BACKGROUND_KEY, value)
     }
 
-    @TextSize
-    var currentTextSizeIndex: Int = TEXT_SIZE_DEFAULT
-        set(value) {
-            if (field == value)
-                return
-
-            val textSizeCoefficient = when (value) {
-                TEXT_SIZE_DEFAULT -> 1.0f
-                TEXT_SIZE_BIG -> 1.2f
-                else -> 1.6f
-            }
-            _textSize.value = textSizeCoefficient * _baseTextSize
-            settings.write(TXT_SIZE_COEFF_KEY, textSizeCoefficient)
-            field = value
-        }
+    val currentTextSizeIndex: Flow<Int> = settings.readFloat(TXT_SIZE_COEFF_KEY, TXT_SIZE_COEFF_UNSET)
+        .map { txtSizeCoefficient ->
+        coefficientToIndex(txtSizeCoefficient)
+    }
 
     fun init(
         @ColorInt currentTextColor: Int,
         @ColorInt currentBackground: Int,
         baseTextSize: Float) {
+        _isLoading = true
         _baseTextSize = baseTextSize
 
-        val txtSizeCoefficient = settings.readFloat(TXT_SIZE_COEFF_KEY, TXT_SIZE_COEFF_UNSET)
-
-        val index = coefficientToIndex(txtSizeCoefficient)
-        val savedTextColor = settings.readInt(TXT_COLOR_KEY, currentTextColor)
-        val savedBackground = settings.readInt(BACKGROUND_KEY, currentBackground)
-        currentTextSizeIndex = index
-        _textColor.value = savedTextColor
-        _backgroundColor.value = savedBackground
+        viewModelScope.launch {
+            val savedTextColor = settings.readInt(TXT_COLOR_KEY, currentTextColor)
+            val savedBackground = settings.readInt(BACKGROUND_KEY, currentBackground)
+            _textColor.value = savedTextColor
+            _backgroundColor.value = savedBackground
+            _isLoading = false
+        }
     }
 
     @TextSize
@@ -91,6 +86,21 @@ class SettingsViewModel(
         1.0f -> TEXT_SIZE_DEFAULT
         1.2f -> TEXT_SIZE_BIG
         else -> TEXT_SIZE_BIGGEST
+    }
+
+    fun updateTextSizeIndex(value: Int) {
+        val textSizeCoefficient = when (value) {
+            TEXT_SIZE_DEFAULT -> 1.0f
+            TEXT_SIZE_BIG -> 1.2f
+            else -> 1.6f
+        }
+
+        val newValue = textSizeCoefficient * _baseTextSize
+
+        if (!_isLoading && newValue != _textSize.value) {
+            _textSize.value = newValue
+            settings.write(TXT_SIZE_COEFF_KEY, textSizeCoefficient)
+        }
     }
 }
 

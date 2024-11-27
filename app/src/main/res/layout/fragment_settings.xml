@@ -29,8 +29,7 @@
                 android:id="@+id/radioGroup"
                 android:layout_marginStart="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checkedButton="@={viewModel.currentTextSizeIndex}">
+                android:layout_height="wrap_content">
                 <RadioButton
                     android:id="@+id/rbDefaultTxt"
                     android:layout_width="wrap_content"

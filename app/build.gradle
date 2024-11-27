@@ -50,6 +50,7 @@ dependencies {
     implementation libs.room.ktx
     implementation libs.ambilwarna
     implementation libs.androidx.junit.ktx
+    implementation libs.androidx.datastore.preferences
     kapt libs.room.compiler
     implementation libs.androidx.constraintlayout
     implementation libs.androidx.navigation.ui

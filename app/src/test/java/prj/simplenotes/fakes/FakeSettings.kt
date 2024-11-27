@@ -1,25 +1,26 @@
 package prj.simplenotes.fakes
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import prj.simplenotes.data.Settings
 
 class FakeSettings: Settings {
     private val map = hashMapOf<String, Any>()
 
-    override fun readInt(key: String, defaultValue: Int): Int {
+    override suspend fun readInt(key: String, defaultValue: Int): Int {
         if (map.containsKey(key))
             return map[key] as Int
         else
             return defaultValue
     }
 
-    override fun readFloat(key: String, defaultValue: Float): Float {
-        if (map.containsKey(key))
-            return map[key] as Float
-        else
-            return defaultValue
+    override fun readFloat(key: String, defaultValue: Float): Flow<Float> {
+        return flow {
+            emit(map[key] as? Float ?: defaultValue)
+        }
     }
 
-    override fun readBoolean(key: String, defaultValue: Boolean): Boolean {
+    override suspend fun readBoolean(key: String, defaultValue: Boolean): Boolean {
         if (map.containsKey(key))
             return map[key] as Boolean
         else
@@ -36,13 +37,5 @@ class FakeSettings: Settings {
 
     override fun write(key: String, value: Boolean) {
         map[key] = value
-    }
-
-    override fun setOnChangedListener(value: Settings.OnChangedListener) {
-        throw UnsupportedOperationException("FakeSettings.addOnChangedListener")
-    }
-
-    override fun removeOnChangedListener() {
-        throw UnsupportedOperationException("FakeSettings.removeOnChangedListener")
     }
 }

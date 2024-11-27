@@ -3,7 +3,6 @@ package prj.simplenotes.ui.mainfragment
 import androidx.annotation.ColorInt
 import androidx.core.util.Supplier
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -11,6 +10,8 @@ import prj.simplenotes.data.Note
 import prj.simplenotes.domain.NotesRepository
 import prj.simplenotes.ui.NotesApplication
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import prj.simplenotes.data.NoteTextSize
 import prj.simplenotes.data.Settings
 import prj.simplenotes.ui.settingsfragment.DEFAULT_BACKGROUND_KEY
@@ -52,33 +53,18 @@ class MainFragmentViewModel(
 
         _baseTitleSize = baseTitleSize
         _baseTxtSize = baseTxtSize
-        updateTextSize()
 
         _settings.write(DEFAULT_BACKGROUND_KEY, itemDefaultBackground)
-
-        _settings.setOnChangedListener(object: Settings.OnChangedListener {
-            override fun onChanged(key: String) {
-                if (key == TXT_SIZE_COEFF_KEY) {
-                    updateTextSize()
-                }
-            }
-        })
     }
 
-    private fun updateTextSize() {
-        val textSize = _settings.readFloat(
-                TXT_SIZE_COEFF_KEY, TXT_SIZE_COEFF_UNSET
-            )
-
+    val textSize: Flow<Unit> = _settings.readFloat(
+        TXT_SIZE_COEFF_KEY, TXT_SIZE_COEFF_UNSET
+    ).map { textSizeCoeff ->
         _noteTextSize = NoteTextSize(
-            textSize * _baseTitleSize,
-            textSize * _baseTxtSize)
-
-        _noteTextSizeChanged.value = Unit
+            textSizeCoeff * _baseTitleSize,
+            textSizeCoeff * _baseTxtSize
+        )
     }
-
-    private val _noteTextSizeChanged = MutableLiveData<Unit>()
-    val noteTextSizeChanged: LiveData<Unit> = _noteTextSizeChanged
 
     fun getNoteTextSizeSupplier(): Supplier<NoteTextSize> {
         return object: Supplier<NoteTextSize> {
@@ -105,10 +91,5 @@ class MainFragmentViewModel(
             _repo.deleteItem(it)
             _noteToDelete = null
         }
-    }
-
-    override fun onCleared() {
-        _settings.removeOnChangedListener()
-        super.onCleared()
     }
 }

@@ -15,8 +15,7 @@ class NotesApplication: Application() {
     override fun onCreate() {
         super.onCreate()
 
-        settings = AndroidSettings(
-            getSharedPreferences("preferences", MODE_PRIVATE))
+        settings = AndroidSettings(this)
         repo = NotesRepositoryImpl(this)
     }
 }

@@ -1,5 +1,6 @@
 package prj.simplenotes.ui.mainfragment
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,9 +18,14 @@ import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import prj.simplenotes.R
 import prj.simplenotes.data.Note
 import prj.simplenotes.ui.common.ItemClickListener
@@ -47,6 +53,7 @@ class MainFragment : Fragment(), MenuProvider {
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -76,8 +83,12 @@ class MainFragment : Fragment(), MenuProvider {
             _itemBackgroundRadius = itemBackgroundRadius,
             _itemTextSizeSupplier = viewModel.getNoteTextSizeSupplier())
         val owner = viewLifecycleOwner
-        viewModel.noteTextSizeChanged.observe(owner) {
-            adapter?.notifyDataSetChanged()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.textSize.collectLatest {
+                    adapter?.notifyDataSetChanged()
+                }
+            }
         }
         viewModel.items.observe(owner) { list ->
             //show/hide the empty view
