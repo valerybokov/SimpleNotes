@@ -35,6 +35,10 @@ class MainActivityViewModel(
         (repo as NotesRepositoryImpl).setScope(scope)
     }
 
+    fun setOnExceptionListener(value: Settings.OnExceptionListener?) {
+        settings.setOnExceptionListener(value)
+    }
+
     fun setOnResultListener(value: OnResultListener) {
         repo.addOnResultListener(value)
     }

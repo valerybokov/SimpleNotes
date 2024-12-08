@@ -8,6 +8,8 @@
     <string name="title_remove">Remove</string>
     <string name="cannot_add_note">Can not add note.</string>
     <string name="cannot_update_note">Can not save changes.</string>
+    <string name="cannot_update_settings">Can not save changes in settings.</string>
+    <string name="cannot_read_settings">Can not read settings. Default settings will be used.</string>
     <string name="cannot_delete_note">Can not delete note.</string>
     <string name="cannot_read_notes">Can not read data from storage.</string>
     <string name="title_completed">completed</string>

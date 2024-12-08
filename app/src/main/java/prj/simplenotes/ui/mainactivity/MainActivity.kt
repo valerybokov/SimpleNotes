@@ -43,12 +43,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        resultListener = RepositoryResultListener(lifecycleScope, application)
+        val scope = lifecycleScope
+        resultListener = RepositoryResultListener(scope, application)
+        viewModel.setOnExceptionListener(SettingsExceptionListener(scope, application))
         viewModel.setOnResultListener(resultListener)
-        viewModel.setScope(lifecycleScope)
+        viewModel.setScope(scope)
     }
 
     override fun onPause() {
+        viewModel.setOnExceptionListener(null)
         viewModel.setScope(null)
         viewModel.removeOnResultListener(resultListener)
         super.onPause()

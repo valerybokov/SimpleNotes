@@ -38,4 +38,8 @@ class FakeSettings: Settings {
     override fun write(key: String, value: Boolean) {
         map[key] = value
     }
+
+    override fun setOnExceptionListener(value: Settings.OnExceptionListener?) {
+        //noop
+    }
 }
