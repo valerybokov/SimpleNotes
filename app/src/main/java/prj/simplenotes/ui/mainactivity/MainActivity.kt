@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        viewModel.setScope(lifecycleScope)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -47,12 +46,10 @@ class MainActivity : AppCompatActivity() {
         resultListener = RepositoryResultListener(scope, application)
         viewModel.setOnExceptionListener(SettingsExceptionListener(scope, application))
         viewModel.setOnResultListener(resultListener)
-        viewModel.setScope(scope)
     }
 
     override fun onPause() {
         viewModel.setOnExceptionListener(null)
-        viewModel.setScope(null)
         viewModel.removeOnResultListener(resultListener)
         super.onPause()
     }

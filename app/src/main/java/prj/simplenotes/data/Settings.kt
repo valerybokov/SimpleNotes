@@ -40,9 +40,9 @@ interface Settings {
 }
 
 class AndroidSettings(
-    private val appContext: Context): Settings {
+    private val appContext: Context,
+    private val scope: CoroutineScope): Settings {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "preferences")
-    private var scope: CoroutineScope? = null
     private var exceptionListener: Settings.OnExceptionListener? = null
     private val writingExceptionHandler = CoroutineExceptionHandler { _: CoroutineContext, exception: Throwable ->
         exceptionListener?.onException(value = exception, isWriting = true)
@@ -50,10 +50,6 @@ class AndroidSettings(
 
     override fun setOnExceptionListener(value: Settings.OnExceptionListener?) {
         exceptionListener = value
-    }
-
-    fun setScope(value: CoroutineScope?) {
-        scope = value
     }
 
     override fun readFloat(key: String, defaultValue: Float): Flow<Float> {
@@ -81,7 +77,7 @@ class AndroidSettings(
     }
 
     override fun write(key: String, value: Float) {
-        scope?.launch(Dispatchers.IO + writingExceptionHandler) {
+        scope.launch(Dispatchers.IO + writingExceptionHandler) {
             appContext.dataStore.edit { prefs ->
                 val prefsKey = floatPreferencesKey(key)
                 prefs[prefsKey] = value
@@ -103,7 +99,7 @@ class AndroidSettings(
     }
 
     override fun write(key: String, value: Int) {
-        scope?.launch(Dispatchers.IO + writingExceptionHandler) {
+        scope.launch(Dispatchers.IO + writingExceptionHandler) {
             appContext.dataStore.edit { prefs ->
                 val prefsKey = intPreferencesKey(key)
                 prefs[prefsKey] = value
@@ -112,7 +108,7 @@ class AndroidSettings(
     }
 
     override fun write(key: String, value: Boolean) {
-        scope?.launch(Dispatchers.IO + writingExceptionHandler) {
+        scope.launch(Dispatchers.IO + writingExceptionHandler) {
             appContext.dataStore.edit { prefs ->
                 val prefsKey = booleanPreferencesKey(key)
                 prefs[prefsKey] = value

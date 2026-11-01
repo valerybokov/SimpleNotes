@@ -4,12 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewmodel.CreationExtras
-import kotlinx.coroutines.CoroutineScope
-import prj.simplenotes.data.AndroidSettings
 import prj.simplenotes.data.Settings
 import prj.simplenotes.domain.NotesRepository
 import prj.simplenotes.domain.NotesRepository.OnResultListener
-import prj.simplenotes.domain.NotesRepositoryImpl
 import prj.simplenotes.ui.NotesApplication
 
 class MainActivityViewModel(
@@ -29,11 +26,6 @@ class MainActivityViewModel(
                 ) as T
             }
         }
-
-    fun setScope(scope: CoroutineScope?) {
-        (settings as AndroidSettings).setScope(scope)
-        (repo as NotesRepositoryImpl).setScope(scope)
-    }
 
     fun setOnExceptionListener(value: Settings.OnExceptionListener?) {
         settings.setOnExceptionListener(value)

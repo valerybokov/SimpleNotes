@@ -12,17 +12,12 @@ import prj.simplenotes.data.db.NotesDatabase
 import java.util.concurrent.CopyOnWriteArrayList
 
 class NotesRepositoryImpl(
-    app: Application): NotesRepository {
+    app: Application,
+    private val _scope: CoroutineScope): NotesRepository {
     private val _notesDao = NotesDatabase.getInstance(app).notesDao()
     private val _mapper = NoteMapper()
     //listeners are notified on Dispatchers.IO while added/removed on the main thread
     private val _eventListeners = CopyOnWriteArrayList<NotesRepository.OnResultListener>()
-
-    private var _scope: CoroutineScope? = null
-
-    fun setScope(value: CoroutineScope?) {
-        _scope = value
-    }
 
     override fun addOnResultListener(value: NotesRepository.OnResultListener) {
         _eventListeners.addIfAbsent(value)
@@ -33,7 +28,7 @@ class NotesRepositoryImpl(
     }
 
     override fun addItem(note: Note) {
-        _scope?.launch(Dispatchers.IO) {
+        _scope.launch(Dispatchers.IO) {
             try {
                 _notesDao.insert(_mapper.toEntity(note))
             }
@@ -46,7 +41,7 @@ class NotesRepositoryImpl(
     }
 
     override fun updateItem(note: Note) {
-        _scope?.launch(Dispatchers.IO) {
+        _scope.launch(Dispatchers.IO) {
             try {
                 _notesDao.update(_mapper.toEntity(note))
             }
@@ -59,7 +54,7 @@ class NotesRepositoryImpl(
     }
 
     override fun deleteItem(note: Note) {
-        _scope?.launch(Dispatchers.IO) {
+        _scope.launch(Dispatchers.IO) {
             try {
                 _notesDao.delete(_mapper.toEntity(note))
                 _eventListeners.forEach {
