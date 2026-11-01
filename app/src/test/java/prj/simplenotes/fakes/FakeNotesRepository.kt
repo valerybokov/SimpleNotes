@@ -5,6 +5,9 @@ import prj.simplenotes.data.Note
 import prj.simplenotes.domain.NotesRepository
 
 class FakeNotesRepository: NotesRepository {
+    var updatedNote: Note? = null
+        private set
+
     override fun addItem(note: Note) {
         /* noop */
     }
@@ -14,7 +17,7 @@ class FakeNotesRepository: NotesRepository {
     }
 
     override fun updateItem(note: Note) {
-        /* noop */
+        updatedNote = note
     }
 
     override fun deleteItem(note: Note) {

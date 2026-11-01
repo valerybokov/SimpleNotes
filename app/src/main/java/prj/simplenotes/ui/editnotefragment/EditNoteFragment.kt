@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import prj.simplenotes.R
 import prj.simplenotes.data.Note
 import prj.simplenotes.databinding.FragmentEditNoteBinding
+import prj.simplenotes.domain.EXCEPTION_CANNOT_DELETE
 import prj.simplenotes.domain.NotesRepository.OnResultListener
 import prj.simplenotes.ui.NotesApplication
 import prj.simplenotes.ui.common.ColorDialogListener
@@ -65,7 +66,12 @@ class EditNoteFragment : Fragment(), MenuProvider {
         }
 
         override fun onError(value: Int) {
-            //this will be handled in the MainActivity
+            //the error message will be shown in the MainActivity
+            if (value == EXCEPTION_CANNOT_DELETE) {
+                lifecycleScope.launch {
+                    viewModel.onDeleteFailed()
+                }
+            }
         }
     }
 

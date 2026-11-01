@@ -89,6 +89,9 @@ class EditNoteViewModel(
     @OperationType
     private var _operationType = OPERATION_NONE
 
+    @OperationType
+    private var _operationTypeBeforeDelete = OPERATION_NONE
+
     private var _note: Note? = null
     private var _isInitialised = false
 
@@ -228,8 +231,16 @@ class EditNoteViewModel(
     /** Delete note and go back form fragment */
     fun deleteNote() {
         _note?.let {
-            _repo.deleteItem(it)
+            _operationTypeBeforeDelete = _operationType
             updateOperationType(OPERATION_DELETE)
+            _repo.deleteItem(it)
+        }
+    }
+
+    /** The note was not deleted, so unsaved changes must be saved again */
+    fun onDeleteFailed() {
+        if (_operationType == OPERATION_DELETE) {
+            updateOperationType(_operationTypeBeforeDelete)
         }
     }
 

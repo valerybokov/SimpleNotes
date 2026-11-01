@@ -218,4 +218,31 @@ class EditNoteViewModelTest {
             )
         }
     }
+
+    @Test
+    fun testSave_after_delete_failed() {
+        runTestInMain {
+            val repo = FakeNotesRepository()
+            val viewModel = EditNoteViewModel(
+                repo, FakeSettings(), SavedStateHandle()
+            )
+            val note = Note(
+                id = 1, background = DEFAULT_BACKGROUND_VALUE,
+                title = "title", text = "text",
+                isCompleted = false
+            )
+            viewModel.init(note)
+
+            val newText = "new text"
+            viewModel.text.value = newText
+            viewModel.deleteNote()
+            viewModel.onDeleteFailed()
+            viewModel.save()
+
+            assertEquals(
+                "changes saved after failed deletion",
+                newText, repo.updatedNote?.text
+            )
+        }
+    }
 }
