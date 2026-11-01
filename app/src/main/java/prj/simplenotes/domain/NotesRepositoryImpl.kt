@@ -9,12 +9,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import prj.simplenotes.data.Note
 import prj.simplenotes.data.db.NotesDatabase
+import java.util.concurrent.CopyOnWriteArrayList
 
 class NotesRepositoryImpl(
     app: Application): NotesRepository {
     private val _notesDao = NotesDatabase.getInstance(app).notesDao()
     private val _mapper = NoteMapper()
-    private val _eventListeners = mutableListOf<NotesRepository.OnResultListener>()
+    //listeners are notified on Dispatchers.IO while added/removed on the main thread
+    private val _eventListeners = CopyOnWriteArrayList<NotesRepository.OnResultListener>()
 
     private var _scope: CoroutineScope? = null
 
@@ -23,9 +25,7 @@ class NotesRepositoryImpl(
     }
 
     override fun addOnResultListener(value: NotesRepository.OnResultListener) {
-        if (!_eventListeners.contains(value)) {
-            _eventListeners.add(value)
-        }
+        _eventListeners.addIfAbsent(value)
     }
 
     override fun removeOnResultListener(value: NotesRepository.OnResultListener) {
