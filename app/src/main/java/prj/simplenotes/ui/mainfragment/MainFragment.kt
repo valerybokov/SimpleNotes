@@ -151,9 +151,7 @@ class MainFragment : Fragment(), MenuProvider {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                adapter?.let {
-                    it.filter.filter(newText)
-                }
+                adapter?.filterBy(newText)
                 return false
             }
         })

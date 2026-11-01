@@ -69,7 +69,12 @@ class NotesAdapter(
     override fun submitList(list: List<Note>?) {
         filter.setOriginalList(list ?: listOf())
 
-        super.submitList(list)
+        //keep the active search applied to the new list
+        filter.refilter()
+    }
+
+    fun filterBy(constraint: CharSequence?) {
+        filter.filterBy(constraint)
     }
 
     override fun getFilter(): Filter {
