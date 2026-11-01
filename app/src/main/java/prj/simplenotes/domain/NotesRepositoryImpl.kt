@@ -2,10 +2,11 @@ package prj.simplenotes.domain
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
+import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import prj.simplenotes.data.Note
 import prj.simplenotes.data.db.NotesDatabase
@@ -70,17 +71,18 @@ class NotesRepositoryImpl(
     }
 
     override fun getItems(): LiveData<List<Note>> {
-        try {
-            return _notesDao.getAll().map {
+        //the query runs later, when the LiveData becomes active,
+        //so errors have to be caught in the stream itself
+        return _notesDao.getAll()
+            .map {
                 _mapper.toNotes(it)
             }
-        }
-        catch (x: Exception) {
-            _eventListeners.forEach {
-                it.onError(EXCEPTION_CANNOT_READ)
+            .catch {
+                _eventListeners.forEach {
+                    it.onError(EXCEPTION_CANNOT_READ)
+                }
+                emit(listOf())
             }
-
-            return MutableLiveData()
-        }
+            .asLiveData()
     }
 }
