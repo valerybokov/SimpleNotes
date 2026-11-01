@@ -220,6 +220,48 @@ class EditNoteViewModelTest {
     }
 
     @Test
+    fun testRestore_editing_only_text_changed() {
+        runTestInMain {
+            val newText = "new text"
+            //the state after process death when only the text was changed
+            val savedStateHandle = SavedStateHandle(
+                mapOf(
+                    HANDLE_OPERATION_TYPE to OPERATION_UPDATE,
+                    HANDLE_IS_COMPLETED to false,
+                    HANDLE_TEXT to newText,
+                )
+            )
+            val repo = FakeNotesRepository()
+            val viewModel = EditNoteViewModel(
+                repo, FakeSettings(), savedStateHandle
+            )
+            val note = Note(
+                id = 1, background = DEFAULT_BACKGROUND_VALUE,
+                title = "title", text = "text",
+                isCompleted = false
+            )
+            viewModel.init(note)
+
+            assertEquals(
+                "restore title",
+                note.title, viewModel.title.value
+            )
+
+            assertEquals(
+                "restore text",
+                newText, viewModel.text.value
+            )
+
+            viewModel.save()
+
+            assertEquals(
+                "saved title",
+                note.title, repo.updatedNote?.title
+            )
+        }
+    }
+
+    @Test
     fun testSave_after_delete_failed() {
         runTestInMain {
             val repo = FakeNotesRepository()

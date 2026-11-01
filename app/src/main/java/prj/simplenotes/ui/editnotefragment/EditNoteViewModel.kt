@@ -147,6 +147,16 @@ class EditNoteViewModel(
                 //OPERATION_UPDATE will be called via observer
             }
         }
+        else
+        if (value != null) {
+            //the state was restored, but only changed fields are in the handle
+            if (!_handle.contains(HANDLE_TITLE)) {
+                title.value = value.title
+            }
+            if (!_handle.contains(HANDLE_TEXT)) {
+                text.value = value.text
+            }
+        }
 
         _handle[HANDLE_IS_COMPLETED] = _isCompleted.value
         _isInitialised = true
