@@ -12,6 +12,7 @@ abstract class NotesDatabase: RoomDatabase() {
     abstract fun notesDao(): NotesDao
 
     companion object {
+        @Volatile
         private var _instance: NotesDatabase? = null
         private val _lock = Any()
 
