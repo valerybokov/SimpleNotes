@@ -124,8 +124,9 @@ class EditNoteFragment : Fragment(), MenuProvider {
 
         //read the base size once: on every resume tbTitle.textSize is already scaled
         val baseTitleSize = tbTitle.textSize
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        val owner = viewLifecycleOwner
+        owner.lifecycleScope.launch {
+            owner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.getTitleSize(baseTitleSize).collectLatest { titleSize ->
                     tbTitle.setTextSize(
                         android.util.TypedValue.COMPLEX_UNIT_PX,
@@ -134,7 +135,7 @@ class EditNoteFragment : Fragment(), MenuProvider {
                 }
             }
         }
-        lifecycleScope.launch {
+        owner.lifecycleScope.launch {
             viewModel.getTextSize(tbEdit.textSize).collect { textSize ->
                 tbEdit.setTextSize(
                     android.util.TypedValue.COMPLEX_UNIT_PX,
@@ -142,7 +143,7 @@ class EditNoteFragment : Fragment(), MenuProvider {
                 )
             }
         }
-        lifecycleScope.launch {
+        owner.lifecycleScope.launch {
             @ColorInt val background = tbEdit.backgroundColor
             @ColorInt val backgroundColor = viewModel.getBackgroundColor(background)
             @ColorInt val textColor = viewModel.getTextColor(tbEdit.currentTextColor)

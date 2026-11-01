@@ -83,8 +83,8 @@ class MainFragment : Fragment(), MenuProvider {
             _itemBackgroundRadius = itemBackgroundRadius,
             _itemTextSizeSupplier = viewModel.getNoteTextSizeSupplier())
         val owner = viewLifecycleOwner
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        owner.lifecycleScope.launch {
+            owner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.textSize.collectLatest {
                     adapter?.notifyDataSetChanged()
                 }

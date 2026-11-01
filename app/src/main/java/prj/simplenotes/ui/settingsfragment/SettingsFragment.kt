@@ -100,8 +100,8 @@ class SettingsFragment: Fragment(), RadioGroup.OnCheckedChangeListener {
 
         val radioGroup = activity.findViewById<RadioGroup>(R.id.radioGroup)
         radioGroup.setOnCheckedChangeListener(this)
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        owner.lifecycleScope.launch {
+            owner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.currentTextSizeIndex.collectLatest { index ->
                     radioGroup.check(indexToId(index))
                 }
