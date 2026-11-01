@@ -122,9 +122,11 @@ class EditNoteFragment : Fragment(), MenuProvider {
         val tbTitle = activity.findViewById<TextView>(R.id.tbTitle)
         val tbEdit = activity.findViewById<TextView>(R.id.tbEdit)
 
+        //read the base size once: on every resume tbTitle.textSize is already scaled
+        val baseTitleSize = tbTitle.textSize
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.getTitleSize(tbTitle.textSize).collectLatest { titleSize ->
+                viewModel.getTitleSize(baseTitleSize).collectLatest { titleSize ->
                     tbTitle.setTextSize(
                         android.util.TypedValue.COMPLEX_UNIT_PX,
                         titleSize
