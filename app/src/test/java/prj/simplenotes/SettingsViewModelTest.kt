@@ -2,14 +2,17 @@ package prj.simplenotes
 
 import android.graphics.Color
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import kotlinx.coroutines.CompletableDeferred
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
+import prj.simplenotes.data.Settings
 import prj.simplenotes.fakes.FakeSettings
 import prj.simplenotes.ui.settingsfragment.BACKGROUND_KEY
 import prj.simplenotes.ui.settingsfragment.DEFAULT_BACKGROUND_VALUE
 import prj.simplenotes.ui.settingsfragment.SettingsViewModel
+import prj.simplenotes.ui.settingsfragment.TEXT_SIZE_BIG
 import prj.simplenotes.ui.settingsfragment.TXT_COLOR_KEY
 import prj.simplenotes.ui.settingsfragment.TXT_SIZE_COEFF_KEY
 
@@ -106,6 +109,32 @@ class SettingsViewModelTest {
                 newBackground,
                 settings.readInt(BACKGROUND_KEY, DEFAULT_BACKGROUND_VALUE)
             )
+        }
+    }
+
+    @Test
+    fun testUpdateTextSizeWhileLoading() {
+        runTestInMain {
+            val baseTextSize = 11f
+            //colors are not read yet when the text size radio button is checked
+            val settings = SlowSettings(CompletableDeferred())
+            val viewModel = SettingsViewModel(settings)
+
+            viewModel.init(Color.YELLOW, Color.BLACK, baseTextSize)
+            viewModel.updateTextSizeIndex(TEXT_SIZE_BIG)
+
+            assertEquals(
+                "text size while loading",
+                1.2f * baseTextSize, viewModel.textSize.value)
+        }
+    }
+
+    private class SlowSettings(
+        private val readGate: CompletableDeferred<Unit>,
+        private val settings: Settings = FakeSettings()): Settings by settings {
+        override suspend fun readInt(key: String, defaultValue: Int): Int {
+            readGate.await()
+            return settings.readInt(key, defaultValue)
         }
     }
 }

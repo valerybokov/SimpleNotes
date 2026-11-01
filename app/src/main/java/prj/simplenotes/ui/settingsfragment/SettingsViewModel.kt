@@ -37,8 +37,6 @@ class SettingsViewModel(
         }
     }
 
-    private var _isLoading = true
-
     private val _textSize = MutableLiveData<Float>()
     val textSize: LiveData<Float> = _textSize
 
@@ -69,7 +67,6 @@ class SettingsViewModel(
         @ColorInt currentTextColor: Int,
         @ColorInt currentBackground: Int,
         baseTextSize: Float) {
-        _isLoading = true
         _baseTextSize = baseTextSize
 
         viewModelScope.launch {
@@ -77,7 +74,6 @@ class SettingsViewModel(
             val savedBackground = settings.readInt(BACKGROUND_KEY, currentBackground)
             _textColor.value = savedTextColor
             _backgroundColor.value = savedBackground
-            _isLoading = false
         }
     }
 
@@ -97,7 +93,7 @@ class SettingsViewModel(
 
         val newValue = textSizeCoefficient * _baseTextSize
 
-        if (!_isLoading && newValue != _textSize.value) {
+        if (newValue != _textSize.value) {
             _textSize.value = newValue
             settings.write(TXT_SIZE_COEFF_KEY, textSizeCoefficient)
         }
