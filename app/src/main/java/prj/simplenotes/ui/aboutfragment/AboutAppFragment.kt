@@ -46,7 +46,7 @@ class AboutAppFragment : Fragment(), View.OnClickListener {
         catch (ex: NameNotFoundException) {
             /* no-op */
         }
-        return "1.0"
+        return "1.1"
     }
 
     override fun onClick(v: View) {
