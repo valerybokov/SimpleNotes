@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace 'prj.simplenotes'
-    compileSdk 34
+    compileSdk 37
 
     defaultConfig {
         applicationId "prj.simplenotes"
@@ -52,6 +52,8 @@ dependencies {
     implementation libs.androidx.junit.ktx
     implementation libs.androidx.datastore.preferences
     kapt libs.room.compiler
+    //Room's bundled metadata reader supports Kotlin up to 2.3
+    kapt libs.kotlin.metadata.jvm
     implementation libs.androidx.constraintlayout
     implementation libs.androidx.navigation.ui
     implementation libs.androidx.navigation.fragment

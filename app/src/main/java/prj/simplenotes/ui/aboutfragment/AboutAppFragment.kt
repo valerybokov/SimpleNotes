@@ -38,8 +38,10 @@ class AboutAppFragment : Fragment(), View.OnClickListener {
 
     private fun getAppVersion(activity: Activity): String {
         try {
-            return activity.packageManager.
-                        getPackageInfo(activity.packageName, 0).versionName
+            activity.packageManager.
+                        getPackageInfo(activity.packageName, 0).versionName?.let {
+                return it
+            }
         }
         catch (ex: NameNotFoundException) {
             /* no-op */
