@@ -128,25 +128,28 @@ class EditNoteFragment : Fragment(), MenuProvider {
         val tbTitle = activity.findViewById<TextView>(R.id.tbTitle)
         val tbEdit = activity.findViewById<TextView>(R.id.tbEdit)
 
-        //read the base size once: on every resume tbTitle.textSize is already scaled
+        //read the base sizes once: on every resume the views are already scaled
         val baseTitleSize = tbTitle.textSize
+        val baseTextSize = tbEdit.textSize
         val owner = viewLifecycleOwner
         owner.lifecycleScope.launch {
             owner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.getTitleSize(baseTitleSize).collectLatest { titleSize ->
-                    tbTitle.setTextSize(
-                        android.util.TypedValue.COMPLEX_UNIT_PX,
-                        titleSize
-                    )
+                launch {
+                    viewModel.getTitleSize(baseTitleSize).collectLatest { titleSize ->
+                        tbTitle.setTextSize(
+                            android.util.TypedValue.COMPLEX_UNIT_PX,
+                            titleSize
+                        )
+                    }
                 }
-            }
-        }
-        owner.lifecycleScope.launch {
-            viewModel.getTextSize(tbEdit.textSize).collect { textSize ->
-                tbEdit.setTextSize(
-                    android.util.TypedValue.COMPLEX_UNIT_PX,
-                    textSize
-                )
+                launch {
+                    viewModel.getTextSize(baseTextSize).collectLatest { textSize ->
+                        tbEdit.setTextSize(
+                            android.util.TypedValue.COMPLEX_UNIT_PX,
+                            textSize
+                        )
+                    }
+                }
             }
         }
         owner.lifecycleScope.launch {
